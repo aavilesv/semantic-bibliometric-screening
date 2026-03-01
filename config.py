@@ -9,7 +9,7 @@
 
 # Ruta del archivo CSV o Excel con los artículos
 # Cambia esta ruta según tu computadora
-INPUT_FILE = r"G:\Mi unidad\bibliometric_review\RESULTS\datawos_scopus.csv"
+INPUT_FILE = r"G:\Mi unidad\2026\Master Elka Almeida\data\datawos_scopus.csv"
 
 
 # =========================
@@ -79,19 +79,24 @@ TEXT_COLS = [
 # Puedes modificarlo según tu investigación
 
 TOPIC_TEXT = """
-This study focuses on the influence of financial technologies (FinTech)
-on financial inclusion within the microfinance sector.
+This study focuses on the factors influencing Faculty Professional Development (FPD)
+in Higher Education Institutions within contexts of digital transformation.
 
-Financial technologies include digital financial services such as
-mobile money, digital payments, online lending platforms, and
-technology-based financial innovations that facilitate access
-to financial services.
+Faculty Professional Development refers to the continuous process through which
+university academics enhance their pedagogical, technological, and professional
+competencies to effectively operate in digitally transformed educational environments.
 
-Financial inclusion refers to the accessibility and effective use
-of formal financial services by underserved populations and
-micro-enterprises.
+Digital transformation in higher education includes structural and systemic changes
+related to digital governance, technology integration, online and hybrid teaching models,
+learning management systems, artificial intelligence adoption, and institutional digital maturity.
 
-The scope prioritizes studies related to microfinance institutions,
-financial inclusion, digital finance, and FinTech adoption
-in developing and emerging economies.
+The scope prioritizes research examining institutional, organizational, technological,
+and psychosocial factors that shape faculty development outcomes. These factors may include
+leadership, governance, policy frameworks, organizational culture, support systems,
+infrastructure, digital ecosystems, sociotechnical dynamics, barriers, enablers, and
+structural conditions affecting professional growth.
+
+The review adopts a systemic and sociotechnical perspective, emphasizing how interrelated
+institutional, technological, and human dimensions interact to influence sustainable
+faculty development in digitally evolving universities.
 """
