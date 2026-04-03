@@ -1,49 +1,20 @@
-# Sistema Modular de Clasificación Bibliométrica con SBERT
+# Sistema Rankeador de Afinidad Semántica SBERT
 
 ## Descripción general
-Este sistema permite clasificar artículos científicos de forma automática según su relevancia temática, impacto bibliométrico y tipo metodológico.  
-Está diseñado para apoyar:
-```text
-- Revisiones sistemáticas
-- Estudios bibliométricos
-- Procesos de selección de literatura académica
-- Pre-filtrado automatizado para PRISMA
-```
-El sistema utiliza modelos de lenguaje basados en SBERT para calcular similitud semántica entre los artículos y el tema de investigación.
+Este sistema funciona de manera eficiente y rastreable como un modelo inmersivo de **priorización y recuperación temática asistida** para registros científicos de Scopus/Web of Science. 
+No actúa como clasificador rígido o decisor binario, sino como un tabulador algorítmico continuo. Su objetivo principal es encontrar la mayor correlación semántica cruzada entre el corpus y tu tema ancla.
 
-## Funcionalidades principales
-```text
-- Clasificación por relevancia temática mediante SBERT
-- Detección automática de artículos seminales
-- Identificación del tipo metodológico del estudio
-- Generación de lista de lectura prioritaria
-- Rescate automático desde media relevancia
-- Auditoría PRISMA de artículos descartados
-- Exportación de resultados en Excel y CSV
-```
-## Requisitos del sistema
+## Principios Teóricos
+El sistema asienta su arquitectura en "Dense Retrieval" bajo modelos orientados SBERT:
+- **Ponderación Jerárquica Textual:** Inyección contextual de directivas que priman la lectura de los campos `Title` e `Index/Author Keywords` íntegros compuestos, en lugar de diluirlos dentro del `Abstract`.
+- **Dimensionalidad Coseno Directa:** Exclusión de métricas "dobles" o normalizaciones alteradas, ofreciendo un `FINAL_SCORE` continuo del -1 al 1.
+- **Transparencia Heurística:** Todas las sugerencias categóricas procedimentales en el sistema son de caracter de Apoyo Interpretativo auxiliar, no verdades dogmáticas irreprochables computadas.
 
-### Versión de Python
-- Python 3.10 o superior
-
-### Librerías necesarias
-```text
-- pandas >= 2.0
-- numpy >= 1.23
-- sentence-transformers >= 2.2
-- openpyxl >= 3.1
-```
 ## Instalación
-pip install pandas numpy sentence-transformers openpyxl
+`pip install pandas numpy sentence-transformers openpyxl`
 
-Opcional (entorno virtual recomendado):
-```text
-python -m venv .venv
-.venv\Scripts\activate
-pip install pandas numpy sentence-transformers openpyxl
-```
 ## Estructura del dataset
-El sistema puede trabajar con cualquier dataset bibliométrico, siempre que contenga las siguientes columnas obligatorias:
+El sistema operará óptimamente sobre base Scopus / WOS:
 ```text
 - Title
 - Abstract
@@ -52,99 +23,34 @@ El sistema puede trabajar con cualquier dataset bibliométrico, siempre que cont
 - Year
 - Cited by
 ```
-Notas importantes:
-```text
-- El archivo puede ser CSV o Excel
-- Los nombres de columnas deben coincidir exactamente
-- Las columnas pueden estar vacías, pero deben existir
-```
-## Configuración del archivo de entrada
-En el archivo config.py modifica la ruta:
+*Si faltan años ('Year') el modelo suspenderá los computos temporales de forma prudente evitando inyectar años sustitutivos por defecto que induzcan sesgos silentes.*
 
-INPUT_FILE = "ruta/a/tu/dataset.csv"
+## Operatividad
+Configura tus hiperparámetros de umbral referencial, modelo embebedor y ancla objetivo dentro de `config.py`.
 
-## Ejecución del sistema
 ```text
-1. Abrir una terminal en la carpeta del proyecto
-2. Ejecutar:
-   python main.py
+python main.py
 ```
-## Flujo del algoritmo
-```text
-1. Lectura del dataset
-2. Limpieza del texto
-3. Construcción del texto semántico
-4. Cálculo de similitud con SBERT
-5. Clasificación por relevancia
-6. Clasificación metodológica
-7. Cálculo de citas por año
-8. Detección de artículos seminales
-9. Rescate desde media relevancia
-10. Generación de auditoría PRISMA
-11. Exportación de resultados
-```
-## Archivos de salida
-```text
-- RESULTADO_MODULAR.xlsx
-- TODOS_CLASIFICADOS.csv
 
-Contenido del Excel:
+## Salida de Datos
+
+Las matrices xlsx se ordenan por defecto de forma descendente continua en función a la Afinidad (Score).
+Output: `RESULTADO_MODULAR_YYYYMMDD_HHMM.xlsx`
+
+Hojas en el libro de trabajo de priorización:
 ```text
-- 0_TODOS_CLASIFICADOS
-- 1_LECTURA_PRIORITARIA
+- 0_RANKING_GENERAL
+- 1_PRIORIZADOS
 - 2_AUDITORIA
-- STATS
+- 3_METADATA (Métricas y versión de la ejecución formalizadas para reproducibilidad científica)
+- ESTADISTICAS_REFERENCIALES
 ```
-## Columnas generadas por el sistema
-```text
-- score_semantic     → similitud semántica con el tema
-- FINAL_SCORE        → score final de relevancia
-- DECISION           → clasificación temática
-- TipoMetodologico   → tipo de estudio
-- CitasPorAño        → citas normalizadas por año
-- EsSeminal          → indicador de artículo seminal
-- In_lectura         → selección para lectura prioritaria
-```
-## Tipos de clasificación generados
 
-### Relevancia temática
-```text
-- 🔥 ALTA RELEVANCIA
-- ✅ MEDIA RELEVANCIA
-- ⚠️ BAJA RELEVANCIA
-- ❌ DESCARTAR
-```
-### Tipo metodológico
-```text
-- Empírico
-- Teórico
-- Review
-- Indeterminado
-```
-## Personalización del sistema
-En el archivo config.py puedes modificar:
-```text
-- TOPIC_TEXT     → texto del tema (ancla semántica)
-- TH_HIGH        → umbral de alta relevancia
-- TH_MID         → umbral de media relevancia
-- TH_LOW         → umbral de baja relevancia
-- RESCUE_RATE    → porcentaje de rescate
-- RESCUE_MIN     → mínimo de artículos rescatados
-- AUDIT_RATE     → porcentaje de auditoría
-- AUDIT_MIN      → tamaño mínimo de auditoría
-- AUDIT_MAX      → tamaño máximo de auditoría
-```
-## Casos de uso
-```text
-- Revisiones sistemáticas PRISMA
-- Estudios bibliométricos
-- Meta-análisis
-- Filtrado automatizado de literatura científica
-- Análisis de tendencias de investigación
-```
-## Licencia
-Se recomienda usar:
-- MIT License
-o
-- Apache 2.0
-****
+## Semántica de Variables
+Dadas las premisas metodológicas, la interpretación principal es:
+- **FINAL_SCORE**    → Ratio vectorial crudo dictaminando superioridad de correlación matemática (Norte del Ranking).
+- **DECISION**       → Clasificación complementaria interpretativa ("ALTA", "MEDIA", "BAJA").
+- **bothkeywords**   → Fusión rigurosa de N-gramas (conceptos de varias palabras) extraída conservando la dimensionalidad ';'.
+- **TipoMetodologico** → Inferencia en acumulación de evidencias mediante conteo multicampo, sujeta a verificación humana (Mixto, Teórico, Empírico, Review, etc).
+- **AltaInfluenciaRelativa** → Variable estadística de percentil dinámico. Substituye al antiguo "Seminal" para transparentar mediciones directas sobre los artículos tope referenciados en función a sus pares filtrados en base de tiempo válido.
+- **YearMissing**    → Bandera explicatoria técnica para documentos carentes de un tiempo oficial y estricto reportado, permitiendo aislarlos de analíticas temporales dudosas.
