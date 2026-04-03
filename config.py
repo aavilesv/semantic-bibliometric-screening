@@ -9,7 +9,7 @@
 
 # Ruta del archivo CSV o Excel con los artículos
 # Cambia esta ruta según tu computadora
-INPUT_FILE = r"G:\Mi unidad\2026\Master Elka Almeida\data\datawos_scopus.csv"
+INPUT_FILE = r"H:\Mi unidad\Artículo latindex\article\data\datawos_scopus.csv"
 
 
 # =========================
@@ -79,24 +79,27 @@ TEXT_COLS = [
 # Puedes modificarlo según tu investigación
 
 TOPIC_TEXT = """
-This study focuses on the factors influencing Faculty Professional Development (FPD)
-in Higher Education Institutions within contexts of digital transformation.
+This study focuses on the relationship between financial technology (FinTech),
+financial inclusion, and economic development in the context of modern financial systems.
+The topic includes research on digital financial services such as mobile banking,
+mobile money, digital payments, and financial technology platforms that facilitate
+access to financial services for individuals and businesses, particularly in
+underserved and unbanked populations.
+The review examines how FinTech contributes to financial inclusion through
+improved access, usage, and quality of financial services, including access to credit,
+savings, insurance, and digital transactions.
 
-Faculty Professional Development refers to the continuous process through which
-university academics enhance their pedagogical, technological, and professional
-competencies to effectively operate in digitally transformed educational environments.
+It also considers the economic impacts associated with financial inclusion driven
+by FinTech, such as economic growth, poverty reduction, productivity, entrepreneurship,
+and reduction of inequality.
 
-Digital transformation in higher education includes structural and systemic changes
-related to digital governance, technology integration, online and hybrid teaching models,
-learning management systems, artificial intelligence adoption, and institutional digital maturity.
+The scope includes studies that analyze determinants, enabling factors, and barriers
+to financial inclusion, including digital infrastructure, financial literacy,
+regulatory frameworks, and socioeconomic conditions.
 
-The scope prioritizes research examining institutional, organizational, technological,
-and psychosocial factors that shape faculty development outcomes. These factors may include
-leadership, governance, policy frameworks, organizational culture, support systems,
-infrastructure, digital ecosystems, sociotechnical dynamics, barriers, enablers, and
-structural conditions affecting professional growth.
+Relevant studies are those that evaluate the role of FinTech in promoting or limiting
+financial inclusion and its broader implications for economic development,
+using empirical, theoretical, or review-based approaches.
 
-The review adopts a systemic and sociotechnical perspective, emphasizing how interrelated
-institutional, technological, and human dimensions interact to influence sustainable
-faculty development in digitally evolving universities.
+
 """

@@ -3,10 +3,7 @@
 # Orquestador del sistema modular de clasificación
 # =========================================================
 
-# Importa la ruta del archivo desde config
-from config import INPUT_FILE
-
-# Importa funciones de los módulos del sistema
+import config
 from core.io_utils import read_input
 from core.text_builder import build_semantic_text
 from core.scoring import load_model, compute_scores, classify
@@ -14,76 +11,67 @@ from core.methodology import classify_methodology
 from core.bibliometrics import compute_citations_per_year, detect_seminal
 from core.selection import apply_rescue, generate_audit
 from core.export import export_results
+import datetime
 
 
 def main():
     """
-    Función principal que ejecuta todo el pipeline.
+    Función principal que orquesta inyectando configuración global.
     """
-
     print("=" * 60)
-    print("📊 SISTEMA MODULAR DE CLASIFICACIÓN BIBLIOMÉTRICA")
+    print("📊 SISTEMA MODULAR BIBLIOMÉTRICO (REFACTORIZADO & RIGUROSO)")
     print("=" * 60)
 
-    # =========================
-    # 1. LECTURA DE DATOS
-    # =========================
+    # Metadata global para reproducibilidad
+    meta = {
+        "Ejecución": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Modelo SBERT": config.MODEL_NAME,
+        "Input File": config.INPUT_FILE,
+        "Topic Text (Parcial)": config.TOPIC_TEXT.strip()[:100],
+        "TH_HIGH": config.TH_HIGH,
+        "TH_MID": config.TH_MID,
+        "TH_LOW": config.TH_LOW,
+        "RESCUE_RATE": config.RESCUE_RATE,
+        "AUDIT_RATE": config.AUDIT_RATE
+    }
+
     print("\n📂 Leyendo archivo de entrada...")
-    df = read_input(INPUT_FILE)
+    df = read_input(config.INPUT_FILE)
 
-    # =========================
-    # 2. CONSTRUCCIÓN DEL TEXTO SEMÁNTICO
-    # =========================
-    print("\n🧠 Construyendo texto semántico...")
-    df = build_semantic_text(df)
+    print("\n📝 Validando columnas y texto...")
+    df = build_semantic_text(df, config.TEXT_COLS)
 
-    # =========================
-    # 3. CARGA DEL MODELO
-    # =========================
-    model = load_model()
+    model = load_model(config.MODEL_NAME)
 
-    # =========================
-    # 4. CÁLCULO DE SCORES
-    # =========================
-    df["score_semantic"] = compute_scores(model, df["text_semantic"])
+    df["score_semantic"] = 0.0
+    df["FINAL_SCORE"] = 0.0
+    df["DECISION"] = "❌ DESCARTAR (Inválido/Incompleto)"
+    df["TipoMetodologico"] = "Indeterminado"
 
-    # Score final (por ahora igual al semántico)
-    df["FINAL_SCORE"] = df["score_semantic"]
+    valid_mask = df["isValid"] == True
+    
+    if valid_mask.sum() > 0:
+        scores = compute_scores(model, df.loc[valid_mask, "text_semantic"], config.TOPIC_TEXT)
+        
+        df.loc[valid_mask, "score_semantic"] = scores
+        df.loc[valid_mask, "FINAL_SCORE"] = scores
+        df.loc[valid_mask, "DECISION"] = df.loc[valid_mask, "FINAL_SCORE"].apply(
+            lambda x: classify(x, config.TH_HIGH, config.TH_MID, config.TH_LOW)
+        )
+        
+        print("\n🔬 Clasificando metodología heurística...")
+        df.loc[valid_mask, "TipoMetodologico"] = df.loc[valid_mask, "Abstract"].apply(classify_methodology)
 
-    # Clasificación por relevancia
-    df["DECISION"] = df["FINAL_SCORE"].apply(classify)
-
-    # =========================
-    # 5. CLASIFICACIÓN METODOLÓGICA
-    # =========================
-    print("\n🔬 Clasificando tipo metodológico...")
-    df["TipoMetodologico"] = df["Abstract"].apply(classify_methodology)
-
-    # =========================
-    # 6. CÁLCULOS BIBLIOMÉTRICOS
-    # =========================
     df = compute_citations_per_year(df)
     df = detect_seminal(df)
 
-    # =========================
-    # 7. RESCATE DESDE MEDIA
-    # =========================
-    df, df_final = apply_rescue(df)
+    df, df_final = apply_rescue(df, config.RESCUE_RATE, config.RESCUE_MIN)
+    audit = generate_audit(df, df_final, config.AUDIT_RATE, config.AUDIT_MIN, config.AUDIT_MAX)
 
-    # =========================
-    # 8. GENERAR AUDITORÍA
-    # =========================
-    audit = generate_audit(df, df_final)
+    export_results(df, df_final, audit, config.INPUT_FILE, meta)
 
-    # =========================
-    # 9. EXPORTACIÓN
-    # =========================
-    export_results(df, df_final, audit)
-
-    print("\n✅ Proceso completado con éxito.")
+    print("\n✅ Trazabilidad completada. Pipeline escalable resuelto.")
     print("=" * 60)
 
-
-# Punto de entrada del programa
 if __name__ == "__main__":
     main()

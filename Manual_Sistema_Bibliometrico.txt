@@ -1,0 +1,58 @@
+
+Sistema Modular de Clasificación Bibliométrica con SBERT
+
+Descripción general
+Este sistema permite clasificar artículos científicos de forma automática según su relevancia temática, impacto bibliométrico y tipo metodológico. Está diseñado para apoyar revisiones sistemáticas, análisis bibliométricos y procesos de selección de literatura académica.
+
+Funcionalidades principales
+- Clasificación por relevancia temática.
+- Detección de artículos seminales.
+- Identificación del tipo metodológico.
+- Generación de lista de lectura prioritaria.
+- Exportación de resultados para revisión sistemática.
+
+Requisitos del sistema
+- Python 3.10 o superior.
+- Librerías: pandas, numpy, sentence-transformers, openpyxl.
+
+Instalación
+pip install pandas numpy sentence-transformers openpyxl
+
+Columnas obligatorias del dataset
+Title
+Abstract
+Author Keywords
+Index Keywords
+Year
+Cited by
+
+Ejecución del sistema
+1. Abrir una terminal en la carpeta del proyecto.
+2. Ejecutar:
+   python main.py
+
+Flujo del algoritmo
+1. Lectura del dataset
+2. Limpieza del texto
+3. Construcción del texto semántico
+4. Cálculo de similitud con SBERT
+5. Clasificación por relevancia
+6. Clasificación metodológica
+7. Cálculo de citas por año
+8. Detección de artículos seminales
+9. Rescate desde media relevancia
+10. Generación de auditoría
+11. Exportación de resultados
+
+Archivos de salida
+RESULTADO_MODULAR.xlsx
+TODOS_CLASIFICADOS.csv
+
+Columnas generadas
+score_semantic
+FINAL_SCORE
+DECISION
+TipoMetodologico
+CitasPorAño
+EsSeminal
+In_lectura

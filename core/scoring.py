@@ -3,89 +3,56 @@
 # Clasificación semántica con SBERT
 # =========================================================
 
-import numpy as np                              # Operaciones numéricas
-from sentence_transformers import SentenceTransformer, util  # SBERT
-from config import MODEL_NAME, TH_HIGH, TH_MID, TH_LOW, TOPIC_TEXT
+import numpy as np
+from sentence_transformers import SentenceTransformer, util
 
 
-def load_model():
+def load_model(model_name):
     """
-    Carga el modelo SBERT definido en config.py.
+    Carga el modelo SBERT inyectado.
     """
-    print("⏳ Cargando modelo semántico SBERT...")
-    model = SentenceTransformer(MODEL_NAME)
+    print(f"⏳ Cargando modelo semántico SBERT ({model_name})...")
+    model = SentenceTransformer(model_name)
     print("✅ Modelo cargado correctamente.")
     return model
 
 
-def normalize(scores):
+def compute_scores(model, texts, topic_text):
     """
-    Normaliza los scores entre 0 y 1.
-    Evita división por cero si todos los scores son iguales.
+    Calcula la similitud semántica entre cada artículo y el texto del tema.
     """
+    print("🧠 Calculando similitud semántica (Coseno real)...")
 
-    smin = scores.min()     # Valor mínimo
-    smax = scores.max()     # Valor máximo
-
-    # Si todos los scores son iguales
-    if smax == smin:
-        return np.zeros_like(scores)
-
-    # Normalización min-max
-    return (scores - smin) / (smax - smin)
-
-
-def compute_scores(model, texts):
-    """
-    Calcula la similitud semántica entre cada artículo
-    y el texto del tema.
-    """
-
-    print("🧠 Calculando similitud semántica...")
-
-    # Embedding del texto del tema
     ref_embedding = model.encode(
-        TOPIC_TEXT,
+        topic_text,
         convert_to_tensor=True
     )
 
-    # Embeddings de los artículos
     article_embeddings = model.encode(
         texts.tolist(),
         convert_to_tensor=True,
-        show_progress_bar=True
+        show_progress_bar=True,
+        batch_size=64  # Control de OOM
     )
 
-    # Cálculo de similitud coseno
     raw_scores = util.cos_sim(
         article_embeddings,
         ref_embedding
     ).cpu().numpy().flatten()
 
-    # Normalización de scores
-    norm_scores = normalize(raw_scores)
+    print("✅ Similitud semántica calculada (Coseno crudo).")
 
-    print("✅ Similitud semántica calculada.")
-
-    return norm_scores
+    return raw_scores
 
 
-def classify(score):
+def classify(score, th_high, th_mid, th_low):
     """
-    Clasifica un artículo según su score semántico.
+    Clasifica un artículo según su score semántico en bruto y umbrales inyectados.
     """
-
-    # Alta relevancia
-    if score >= TH_HIGH:
+    if score >= th_high:
         return "🔥 ALTA RELEVANCIA"
-
-    # Media relevancia
-    if score >= TH_MID:
+    if score >= th_mid:
         return "✅ MEDIA RELEVANCIA"
-
-    # Baja relevancia
-    if score >= TH_LOW:
+    if score >= th_low:
         return "⚠️ BAJA RELEVANCIA"
-
-    # Descartado
     return "❌ DESCARTAR"
